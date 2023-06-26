@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\API\CustomerController;
 use App\Http\Controllers\API\CategoryProductController;
+use App\Http\Controllers\API\ProductController;
 
 
 
@@ -31,4 +32,13 @@ Route::group(['prefix' => 'categories'], function () {
     Route::get('/{id}', [CategoryProductController::class, 'show']);
     Route::put('/{id}', [CategoryProductController::class, 'update']);
     Route::delete('/{id}', [CategoryProductController::class, 'destroy']);
+});
+
+//ROUTE YANG DIGUNAKAN UNTUK MENJALANKAN CRUD DATA PRODUCT [ADMIN]
+Route::group(['prefix' => 'products'], function () {
+    Route::get('/', [ProductController::class, 'index']);
+    Route::post('/', [ProductController::class, 'store']);
+    Route::get('/{id}', [ProductController::class, 'show']);
+    Route::put('/{id}', [ProductController::class, 'update']);
+    Route::delete('/{id}', [ProductController::class, 'destroy']);
 });
