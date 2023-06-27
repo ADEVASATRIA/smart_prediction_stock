@@ -6,6 +6,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CustomerController;
 use App\Http\Controllers\API\CategoryProductController;
 use App\Http\Controllers\API\ProductController;
+use App\Http\Controllers\API\UserController;
 
 
 
@@ -46,4 +47,13 @@ Route::group(['prefix' => 'products'], function () {
     Route::get('/{id}', [ProductController::class, 'show']);
     Route::put('/{id}', [ProductController::class, 'update']);
     Route::delete('/{id}', [ProductController::class, 'destroy']);
+});
+
+//ROUTE YANG DIGUNAKAN UNTUK MELAKUKAN CRUD DATA USERS [ADMIN]
+Route::group(['middleware' => 'auth:api'], function () {
+    Route::get('users', [UserController::class, 'index']);
+    Route::post('users', [UserController::class, 'store']);
+    Route::get('users/{id}', [UserController::class, 'show']);
+    Route::put('users/{id}', [UserController::class, 'update']);
+    Route::delete('users/{id}', [UserController::class, 'destroy']);
 });
