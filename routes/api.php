@@ -32,12 +32,12 @@ Route::group(['middleware' => 'auth:api'], function () {
 });
 
 //ROUTE YANG DIGUNAKAN UNTUK MELAKUKAN CRUD DATA CATEGORY PRODUCT [ADMIN]
-Route::group(['prefix' => 'categories'], function () {
-    Route::get('/', [CategoryProductController::class, 'index']);
-    Route::post('/', [CategoryProductController::class, 'store']);
-    Route::get('/{id}', [CategoryProductController::class, 'show']);
-    Route::put('/{id}', [CategoryProductController::class, 'update']);
-    Route::delete('/{id}', [CategoryProductController::class, 'destroy']);
+Route::group(['prefix' => 'admin', 'middleware' => 'auth:api'], function () {
+    Route::get('categories', [CategoryProductController::class, 'index']);
+    Route::get('categories/{id}', [CategoryProductController::class, 'show']);
+    Route::post('categories', [CategoryProductController::class, 'store']);
+    Route::put('categories/{id}', [CategoryProductController::class, 'update']);
+    Route::delete('categories/{id}', [CategoryProductController::class, 'destroy']);
 });
 
 //ROUTE YANG DIGUNAKAN UNTUK MENJALANKAN CRUD DATA PRODUCT [ADMIN]
