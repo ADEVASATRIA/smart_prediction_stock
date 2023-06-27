@@ -7,9 +7,17 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\CategoryProduct;
 use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class ProductController extends Controller
 {
+    public function __construct()
+    {
+        // Terapkan middleware jwt.auth pada semua metode kecuali index dan show
+        $this->middleware('jwt.auth')->except(['index', 'show']);
+    }
+
     public function index()
     {
         $products = Product::all();
@@ -22,6 +30,20 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
+        // Mendapatkan token dari header Authorization
+        $token = JWTAuth::getToken();
+
+        try {
+            // Memeriksa validitas token dan peran pengguna
+            $user = JWTAuth::toUser($token);
+            if ($user->role !== 'admin') {
+                return response()->json(['message' => 'Unauthorized'], 401);
+            }
+        } catch (JWTException $e) {
+            // Jika token tidak valid, kembalikan respon error
+            return response()->json(['message' => 'Invalid token'], 401);
+        }
+
         $validator = Validator::make($request->all(), [
             'name' => 'required|string',
             'price' => 'required|numeric',
@@ -68,6 +90,20 @@ class ProductController extends Controller
 
     public function update(Request $request, $id)
     {
+        // Mendapatkan token dari header Authorization
+        $token = JWTAuth::getToken();
+
+        try {
+            // Memeriksa validitas token dan peran pengguna
+            $user = JWTAuth::toUser($token);
+            if ($user->role !== 'admin') {
+                return response()->json(['message' => 'Unauthorized'], 401);
+            }
+        } catch (JWTException $e) {
+            // Jika token tidak valid, kembalikan respon error
+            return response()->json(['message' => 'Invalid token'], 401);
+        }
+
         $validator = Validator::make($request->all(), [
             'name' => 'required|string',
             'price' => 'required|numeric',
@@ -103,6 +139,20 @@ class ProductController extends Controller
 
     public function destroy($id)
     {
+        // Mendapatkan token dari header Authorization
+        $token = JWTAuth::getToken();
+
+        try {
+            // Memeriksa validitas token dan peran pengguna
+            $user = JWTAuth::toUser($token);
+            if ($user->role !== 'admin') {
+                return response()->json(['message' => 'Unauthorized'], 401);
+            }
+        } catch (JWTException $e) {
+            // Jika token tidak valid, kembalikan respon error
+            return response()->json(['message' => 'Invalid token'], 401);
+        }
+
         $product = Product::find($id);
 
         if (!$product) {
