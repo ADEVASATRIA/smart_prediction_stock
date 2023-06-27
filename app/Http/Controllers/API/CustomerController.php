@@ -6,15 +6,22 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Customer;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\API\AuthController;
 
 class CustomerController extends Controller
 {
+    public function __construct()
+    {
+        $this->authController = new AuthController();
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $customers = Customer::all();
+        $customers = Customer::where('user_id', Auth::user()->id)->get();
+
         return response()->json([
             'success' => true,
             'data' => $customers
@@ -27,8 +34,8 @@ class CustomerController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|email|unique:customers',
+            'name' => 'required|string',
+            'email' => 'required|email|unique:customers,email',
             'phone_number' => 'required',
         ]);
 
@@ -39,12 +46,17 @@ class CustomerController extends Controller
             ], 422);
         }
 
-        $customer = Customer::create($request->all());
+        $customer = Customer::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone_number' => $request->phone_number,
+            'user_id' => Auth::user()->id,
+        ]);
 
         return response()->json([
             'success' => true,
             'data' => $customer
-        ], 201);
+        ]);
     }
 
     /**
@@ -52,6 +64,13 @@ class CustomerController extends Controller
      */
     public function show(Customer $customer)
     {
+        if ($customer->user_id !== Auth::user()->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Customer not found'
+            ], 404);
+        }
+
         return response()->json([
             'success' => true,
             'data' => $customer
@@ -61,10 +80,26 @@ class CustomerController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Customer $customer)
+    public function update(Request $request, $id)
     {
+        $customer = Customer::find($id);
+
+        if (!$customer) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Customer not found'
+            ], 404);
+        }
+
+        if ($customer->user_id !== Auth::user()->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        }
+
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
+            'name' => 'required|string',
             'email' => 'required|email|unique:customers,email,' . $customer->id,
             'phone_number' => 'required',
         ]);
@@ -89,12 +124,20 @@ class CustomerController extends Controller
      */
     public function destroy(Customer $customer)
     {
+        if ($customer->user_id !== Auth::user()->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Customer not found'
+            ], 404);
+        }
+
         $customer->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Customer deleted successfully.'
+            'message' => 'Customer deleted successfully'
         ]);
     }
 }
+
 

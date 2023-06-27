@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Validator;
+use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\Controller;
+use App\Http\Controllers\API\CustomerController;
 
 class AuthController extends Controller
 {
@@ -15,6 +17,7 @@ class AuthController extends Controller
 
         return response()->json($users);
     }
+
     /**
      * Create a new AuthController instance.
      *

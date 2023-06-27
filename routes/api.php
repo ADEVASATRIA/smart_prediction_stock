@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CustomerController;
 use App\Http\Controllers\API\CategoryProductController;
 use App\Http\Controllers\API\ProductController;
@@ -11,18 +11,23 @@ use App\Http\Controllers\API\ProductController;
 
 
 //ROUTE YANG DIGUNAKAN UNTUK MELAKUKAN CRUD DATA CUSTOMERS [ADMIN]
-Route::middleware('admin')->group(function () {
-    Route::apiResource('customers', CustomerController::class);
+Route::group(['middleware' => 'auth:api', 'prefix' => 'admin'], function () {
+    Route::get('/customers', [CustomerController::class, 'index']);
+    Route::post('/customers', [CustomerController::class, 'store']);
+    Route::get('/customers/{customer}', [CustomerController::class, 'show']);
+    Route::put('/customers/{customer}', [CustomerController::class, 'update']);
+    Route::delete('/customers/{customer}', [CustomerController::class, 'destroy']);
 });
 
 //ROUTE YANG DIGUNAKAN UNTUK PROSES LOGIN,REGISTER,LOGOUT, DLL
 Route::post('register', [AuthController::class, 'register']);
-Route::post('login', [AuthController::class, 'login']);
+Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::group(['middleware' => 'auth:api'], function () {
     Route::get('me', [AuthController::class, 'me']);
     Route::post('logout', [AuthController::class, 'logout']);
     Route::post('refresh', [AuthController::class, 'refresh']);
-    Route::get('user', [AuthController::class, 'index']);
+    Route::get('users', [AuthController::class, 'index']);
+    Route::delete('users/{id}', [AuthController::class, 'destroy']);
 });
 
 //ROUTE YANG DIGUNAKAN UNTUK MELAKUKAN CRUD DATA CATEGORY PRODUCT [ADMIN]

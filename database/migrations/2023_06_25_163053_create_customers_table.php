@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained();
             $table->string('name');
             $table->string('email')->unique();
             $table->string('phone_number');
@@ -28,3 +29,4 @@ return new class extends Migration
         Schema::dropIfExists('customers');
     }
 };
+
